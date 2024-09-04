@@ -1,0 +1,193 @@
+import java.util.*;
+
+public class BankingTransactionTracker {
+    private static Map<String, Account> accounts = new HashMap<>();
+
+    private static class Account {
+        private String name;
+        private String accountNumber;
+        private String accountType;
+        private int balance;
+        private Stack<Integer> transactionStack;
+
+        public Account(String name, String accountNumber, String accountType) {
+            this.name = name;
+            this.accountNumber = accountNumber;
+            this.accountType = accountType;
+            this.balance = 0;
+            this.transactionStack = new Stack<>();
+        }
+
+        public void deposit(int amount) {
+            transactionStack.push(amount);
+            balance += amount;
+            System.out.println("Deposited: " + amount);
+        }
+
+        public void withdraw(int amount) {
+            if (balance >= amount) {
+                transactionStack.push(-amount); // Negative value to indicate a withdrawal
+                balance -= amount;
+                System.out.println("Withdrawn: " + amount);
+            } else {
+                System.out.println("Insufficient balance.");
+            }
+        }
+
+        public void balanceInquiry() {
+            System.out.println("Account Holder: " + name);
+            System.out.println("Account Number: " + accountNumber);
+            System.out.println("Account Type: " + accountType);
+            System.out.println("Current balance: " + balance);
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\nChoose the module:");
+            System.out.println("1. Manager");
+            System.out.println("2. Customer");
+            System.out.println("3. Staff");
+            System.out.println("4. Exit");
+            int moduleChoice = scanner.nextInt();
+
+            switch (moduleChoice) {
+                case 1:
+                    managerModule(scanner);
+                    break;
+                case 2:
+                    customerModule(scanner);
+                    break;
+                case 3:
+                    staffModule(scanner);
+                    break;
+                case 4:
+                    System.out.println("Thank you for using the banking transaction tracker!");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+                    break;
+            }
+        }
+    }
+
+    private static void managerModule(Scanner scanner) {
+        System.out.println("Welcome to the Manager Module!");
+        System.out.println("Choose an action:");
+        System.out.println("1. View All Accounts");
+        System.out.println("2. Exit");
+        int choice = scanner.nextInt();
+
+        switch (choice) {
+            case 1:
+                viewAllAccounts();
+                break;
+            case 2:
+                return;
+            default:
+                System.out.println("Invalid choice. Please try again.");
+                break;
+        }
+    }
+
+    private static void viewAllAccounts() {
+        System.out.println("\nAll Accounts:");
+        for (Account account : accounts.values()) {
+            System.out.println("Account Number: " + account.accountNumber);
+            System.out.println("Account Holder: " + account.name);
+            System.out.println("Account Type: " + account.accountType);
+            System.out.println("Current balance: " + account.balance);
+            System.out.println("-------------------------");
+        }
+    }
+
+    private static void customerModule(Scanner scanner) {
+        System.out.print("Enter your account number: ");
+        String accountNumber = scanner.next();
+
+        if (accounts.containsKey(accountNumber)) {
+            Account account = accounts.get(accountNumber);
+
+            while (true) {
+                System.out.println("\nWelcome, " + account.name + "!");
+                System.out.println("Choose an action:");
+                System.out.println("1. Deposit");
+                System.out.println("2. Withdraw");
+                System.out.println("3. Balance Inquiry");
+                System.out.println("4. Exit");
+                int choice = scanner.nextInt();
+
+                switch (choice) {
+                    case 1:
+                        System.out.print("Enter deposit amount: ");
+                        int depositAmount = scanner.nextInt();
+                        account.deposit(depositAmount);
+                        break;
+                    case 2:
+                        System.out.print("Enter withdrawal amount: ");
+                        int withdrawalAmount = scanner.nextInt();
+                        account.withdraw(withdrawalAmount);
+                        break;
+                    case 3:
+                        account.balanceInquiry();
+                        break;
+                    case 4:
+                        return;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                        break;
+                }
+            }
+        }
+ else {
+            System.out.println("Account not found.");
+        }
+    }
+
+    private static void staffModule(Scanner scanner) {
+        System.out.print("Enter the staff password: ");
+        String password = scanner.next();
+
+        if (password.equals("1212")) {
+            System.out.println("Welcome, Staff Member!");
+            while (true) {
+                System.out.println("Choose an action:");
+                System.out.println("1. Create Account");
+                System.out.println("2. Exit");
+                int choice = scanner.nextInt();
+
+                switch (choice) {
+                    case 1:
+                        createAccount(scanner);
+                        break;
+                    case 2:
+                        return;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                        break;
+                }
+            }
+        } else {
+            System.out.println("Incorrect password. Access denied.");
+        }
+    }
+
+    private static void createAccount(Scanner scanner) {
+        System.out.print("Enter the name of the user: ");
+        String name = scanner.next();
+        System.out.print("Enter the account number: ");
+        String accountNumber = scanner.next();
+        System.out.print("Enter the account type: ");
+        String accountType = scanner.next();
+
+        if (!accounts.containsKey(accountNumber)) {
+            Account account = new Account(name, accountNumber, accountType);
+            accounts.put(accountNumber, account);
+            System.out.println("Account created successfully!");
+        } else {
+            System.out.println("An account with this account number already exists.");
+        }
+    }
+}
